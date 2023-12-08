@@ -4,28 +4,24 @@ import numpy as np
 from pydicom.dataset import Dataset
 from rt_utils import image_helper as imhelp
 import os
+from glob import glob
 import matplotlib.pyplot as plt
 
 
-def get_3D_coordinates(directory_path):
+def get_transformation_matrix(path):
     # load all images into series data
     series_data = []
-    for file in os.listdir(directory_path):
+    for file in glob(f"{path}/*.dcm"):
         ds = dcmread(file)
         series_data.append(ds)
-    print(series_data)
 
     #transformation matrix that maps 2D pixels to 3D coordinates
     transformation_matrix = imhelp.get_pixel_to_patient_transformation_matrix(series_data)
-    print(transformation_matrix)
+    return transformation_matrix
 
     #get the contour coordinates
     #result = imhelp.get_contours_coords(series_data)
 
-def main():
-    #test
-    inp = input("File Path: ")
-    get_3D_coordinates(inp)
 
 
 #coords = imhelp.get_contours_coords(series_data)
