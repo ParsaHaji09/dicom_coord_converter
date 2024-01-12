@@ -3,6 +3,7 @@ from pydicom import dcmread
 import numpy as np
 from rt_utils import image_helper as imhelp
 import os
+from glob import glob
 import matplotlib.pyplot as plt
 
 class ROIData:
@@ -11,16 +12,15 @@ class ROIData:
     approximate_contours: bool = True
 
 
-def get_3D_coordinates(directory_path):
+def get_transformation_matrix(path):
     # load all images into series data
     series_data = []
-    for file in os.listdir(directory_path):
-        ds = dcmread(directory_path+file)
+    for file in glob(f"{path}/*.dcm"):
+        ds = dcmread(file)
         series_data.append(ds)
 
     #transformation matrix that maps 2D pixels to 3D coordinates
     transformation_matrix = imhelp.get_pixel_to_patient_transformation_matrix(series_data)
-    print("Transformation Matrix")
     print(transformation_matrix)
 
 
@@ -41,21 +41,10 @@ def get_3D_coordinates(directory_path):
     contours, _ = imhelp.find_mask_contours(third_slice, data_roi.approximate_contours)
     result = imhelp.get_contours_coords(data_roi, series_data)
 
-    result_array = np.array(contours)
-    fig = plt.figure()
-    ax = fig.add_subplot( projection='3d')
-    ax.scatter(result_array[:, 0], result_array[:, 1], result_array[:, 2])
-    
-    print("third slice")
-    print(contours)
-    print("Contours")
-    print(result)
-
-    plt.show()
-
-
-inp = "./test_data/"
-get_3D_coordinates(inp)
+def main():
+    #test
+    inp = input("File Path: ")
+    get_3D_coordinates(inp)
 
 
 #coords = imhelp.get_contours_coords(series_data)
